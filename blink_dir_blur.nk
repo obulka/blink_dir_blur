@@ -1,0 +1,415 @@
+set cut_paste_input [stack 0]
+version 11.1 v4
+push 0
+push $cut_paste_input
+Group {
+ inputs 2
+ name BlinkDirBlur
+ selected true
+ xpos -287
+ ypos 214
+ addUserKnob {20 User}
+ addUserKnob {19 Radial_Length l "Radial Length"}
+ Radial_Length {100 100 100 100}
+ addUserKnob {6 Radial_Length_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Radial_Length_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Radial_Length_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {19 Zoom_Blur l "Zoom Length"}
+ Zoom_Blur {0 0 0 0}
+ addUserKnob {6 Zoom_Blur_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Zoom_Blur_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Zoom_Blur_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {19 Linear_Blur l "Linear Length"}
+ Linear_Blur {0 0 0 0}
+ addUserKnob {6 Linear_Blur_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Linear_Blur_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 ""}
+ addUserKnob {12 Center}
+ Center {1024 778}
+ addUserKnob {22 initCenter l "init Center" -STARTLINE T "n = nuke.thisNode()\nn\['Center'].setValue(\[(n.width()/2), (n.height()/2)])"}
+ addUserKnob {19 Blur_Angle l "Blur Angle"}
+ Blur_Angle 90
+ addUserKnob {6 Blur_Angle_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Blur_Angle_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {19 Aspect}
+ Aspect 1
+ addUserKnob {6 Aspect_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Aspect_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Aspect_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Linear_Blur_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Blur_Angle_panelDropped_2 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 ""}
+ addUserKnob {3 Samples}
+ Samples 106
+ addUserKnob {6 AutoSample l "Auto Increment Samples" -STARTLINE}
+ addUserKnob {6 Fade_To_Center l "Fade To Center" +STARTLINE}
+ addUserKnob {6 MapAllChannels l "Map All Channels" -STARTLINE}
+ MapAllChannels true
+ addUserKnob {26 ""}
+ addUserKnob {20 GPU_Settings l "GPU Settings"}
+ addUserKnob {7 PercentageGPUmemory l "Percentage of GPU memory to use" R 0 100}
+ PercentageGPUmemory 50
+ addUserKnob {7 PercentageHeightTile l "Percentage of image height per tile" R 0 100}
+ PercentageHeightTile 40
+}
+ Input {
+  inputs 0
+  name Lengh_Map
+  xpos 1081
+  ypos -178
+  number 1
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  xpos 1081
+  ypos -95
+  disable {{parent.MapAllChannels}}
+ }
+ Dot {
+  name Dot15
+  xpos 1115
+  ypos -36
+ }
+set N9f420d0 [stack 0]
+ Input {
+  inputs 0
+  name Image
+  xpos 465
+  ypos -187
+ }
+ Dot {
+  name Dot1
+  xpos 499
+  ypos -92
+ }
+set N9f4b130 [stack 0]
+ Dot {
+  name Dot8
+  xpos 641
+  ypos -92
+ }
+set N9f4f960 [stack 0]
+ Dot {
+  name Dot9
+  xpos 780
+  ypos -92
+ }
+set N9f54200 [stack 0]
+ Dot {
+  name Dot10
+  xpos 904
+  ypos -92
+ }
+set N9f58a80 [stack 0]
+ Dot {
+  name Dot11
+  xpos 1031
+  ypos -92
+ }
+ BlinkScript {
+  inputs 2
+  recompileCount 29
+  ProgramGroup 1
+  KernelDescription "2 \"FastDirBlur\" iterate componentWise c25a895378626de14180e757b260c558330aba0c468581257c9dc8ae34a6993b 3 \"src\" Read Random \"map\" Read Point \"dst\" Write Point 9 \"Radial Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Zoom Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Linear Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Blur Angle\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== \"Fade To Center\" Bool 1 AA== \"Max Distance To Center\" Float 1 AAAAAA== 9 \"radial_length\" 4 1 \"zoom_length\" 4 1 \"linear_length\" 4 1 \"angle\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 \"fade_to_center\" 1 1 \"max_dist_corner\" 1 1 1 \"mapconstEdgeColor\" Float 4 1 AAAAAAAAAAAAAAAAAAAAAA=="
+  kernelSource "kernel FastDirBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eRead, eAccessPoint, eEdgeConstant> map;\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 radial_length;  // This local variable is not exposed to the user.\n    float4 zoom_length;\n    float4 linear_length;\n    float4 angle;\n    float2 center;\n    int samples;\n    float4 aspect; \n    bool fade_to_center;\n    float max_dist_corner;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(radial_length, \"Radial Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n    defineParam(zoom_length, \"Zoom Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n    defineParam(linear_length, \"Linear Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(angle, \"Blur Angle\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n\n    defineParam(fade_to_center, \"Fade To Center\", false);\n    defineParam(max_dist_corner, \"Max Distance To Center\", 0.0f);\n  \}\n\n  void process(int3 pos) \{\n    SampleType(map) blur_map = map();\n\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float theta_add = radial_length\[pos.z] * blur_map\[pos.z] / samples;\n\n    float lin_x = 0.0f;\n    float lin_y = 0.0f;\n\n    float fade_scale = fade_to_center ? radius / max_dist_corner : 1;\n\n    float radius_sub = zoom_length\[pos.z] * fade_scale * blur_map\[pos.z] / samples;\n    float lin_x_add = linear_length\[pos.z] * cos(angle\[pos.z]) * fade_scale * blur_map\[pos.z] / samples;\n    float lin_y_add = linear_length\[pos.z] * sin(angle\[pos.z]) * fade_scale * blur_map\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    int sample = 0;\n    while (sample < samples && radius >= 0) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x + lin_x, radius * sin(theta) + center.y + lin_y);\n\n      theta += theta_add;\n      radius -= radius_sub;\n      lin_x += lin_x_add;\n      lin_y += lin_y_add;\n      sample++;\n    \}\n    dst() = sum / sample;\n  \}\n\};\n"
+  rebuild ""
+  "FastDirBlur_Radial Length" {{radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)}}
+  "FastDirBlur_Zoom Length" {{parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur}}
+  "FastDirBlur_Linear Length" {{parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur}}
+  "FastDirBlur_Blur Angle" {{radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)}}
+  FastDirBlur_Center {{parent.Center.x} {parent.Center.y}}
+  FastDirBlur_Samples {{"max(abs(rint(max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y))) * radians(max(max(parent.Radial_Length.r,parent.Radial_Length.g), max(parent.Radial_Length.b,parent.Radial_Length.a)))/4)), max(rint(abs(max(max(parent.Zoom_Blur.r,parent.Zoom_Blur.g), max(parent.Zoom_Blur.b,parent.Zoom_Blur.a)))), rint(abs(max(max(parent.Linear_Blur.r,parent.Linear_Blur.g), max(parent.Linear_Blur.b,parent.Linear_Blur.a))))))  +1"}}
+  FastDirBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  "FastDirBlur_Fade To Center" {{parent.Fade_To_Center}}
+  "FastDirBlur_Max Distance To Center" {{"max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y)))"}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name RadialZoomLinearMap
+  xpos 997
+  ypos 16
+ }
+ Dot {
+  name Dot12
+  xpos 1031
+  ypos 229
+ }
+push $N9f420d0
+ Dot {
+  name Dot19
+  xpos 972
+  ypos -36
+ }
+set N9f884e0 [stack 0]
+push $N9f58a80
+ BlinkScript {
+  inputs 2
+  recompileCount 7
+  ProgramGroup 1
+  KernelDescription "2 \"ZoomBlur\" iterate componentWise fc63d6bb83f8e8a433055d6f9124d9f7b3a55a98e55bfdfb1447f1fb3b3fbce6 3 \"src\" Read Random \"map\" Read Point \"dst\" Write Point 6 \"Zoom Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== \"Fade To Center\" Bool 1 AA== \"Max Distance To Center\" Float 1 AAAAAA== 6 \"zoom_length\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 \"fade_to_center\" 1 1 \"max_dist_corner\" 1 1 0"
+  kernelSource "kernel ZoomBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eRead, eAccessPoint, eEdgeClamped> map;\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 zoom_length;\n    float2 center;\n    int samples;\n    float4 aspect; \n    bool fade_to_center;\n    float max_dist_corner;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(zoom_length, \"Zoom Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n\n    defineParam(fade_to_center, \"Fade To Center\", false);\n    defineParam(max_dist_corner, \"Max Distance To Center\", 0.0f);\n  \}\n\n  void process(int3 pos) \{\n    SampleType(map) blur_map = map();\n\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float fade_scale = fade_to_center ? radius / max_dist_corner : 1;\n\n    float radius_sub = zoom_length\[pos.z] * fade_scale * blur_map\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    int sample = 0;\n    while (sample < samples && radius >= 0) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x, radius * sin(theta) + center.y);\n\n      radius -= radius_sub;\n      sample++;\n    \}\n    dst() = sum / sample;\n  \}\n\};\n"
+  rebuild ""
+  "ZoomBlur_Zoom Length" {{parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur} {curve}}
+  ZoomBlur_Center {{parent.Center.x} {parent.Center.y}}
+  ZoomBlur_Samples {{"rint(abs(max(max(parent.Zoom_Blur.r,parent.Zoom_Blur.g), max(parent.Zoom_Blur.b,parent.Zoom_Blur.a)))) +1"}}
+  ZoomBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  "ZoomBlur_Fade To Center" {{parent.Fade_To_Center}}
+  "ZoomBlur_Max Distance To Center" {{"max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y)))"}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name ZoomMap
+  xpos 870
+  ypos 16
+ }
+ Dot {
+  name Dot13
+  xpos 904
+  ypos 160
+ }
+push $N9f884e0
+ Dot {
+  name Dot18
+  xpos 834
+  ypos -36
+ }
+set N9fab370 [stack 0]
+push $N9f54200
+ BlinkScript {
+  inputs 2
+  recompileCount 31
+  ProgramGroup 1
+  KernelDescription "2 \"RadialBlur\" iterate componentWise 2f87013377d6ab9234e333a0b33ab31a1ca00ccde98e8262c6a6439e1a8f31aa 3 \"src\" Read Random \"map\" Read Point \"dst\" Write Point 4 \"Radial Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== 4 \"radial_length\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 0"
+  kernelSource "kernel RadialBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eRead, eAccessPoint, eEdgeClamped> map;\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 radial_length;  // This local variable is not exposed to the user.\n    float2 center;\n    int samples;\n    float4 aspect; \n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(radial_length, \"Radial Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n  \}\n\n  void process(int3 pos) \{\n    SampleType(map) blur_map = map();\n\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float theta_add = radial_length\[pos.z] * blur_map\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    for (int sample=0; sample < samples; sample++) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x, radius * sin(theta) + center.y);\n\n      theta += theta_add;\n    \}\n    dst() = sum / samples;\n  \}\n\};\n"
+  rebuild ""
+  "RadialBlur_Radial Length" {{radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)}}
+  RadialBlur_Center {{parent.Center.x} {parent.Center.y}}
+  RadialBlur_Samples {{"abs(rint(max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y))) * radians(max(max(parent.Radial_Length.r,parent.Radial_Length.g), max(parent.Radial_Length.b,parent.Radial_Length.a)))/4)) +1"}}
+  RadialBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name RadialMap
+  xpos 746
+  ypos 15
+ }
+ Dot {
+  name Dot14
+  xpos 780
+  ypos 84
+ }
+push $N9fab370
+ Dot {
+  name Dot17
+  xpos 705
+  ypos -36
+ }
+push $N9f4f960
+ BlinkScript {
+  inputs 2
+  recompileCount 31
+  ProgramGroup 1
+  KernelDescription "2 \"LinearBlur\" iterate componentWise c629f58accebefd0cc73ea047a771d032b6e49058ac227a4bf2d42fe539ff77d 3 \"src\" Read Random \"map\" Read Point \"dst\" Write Point 4 \"Linear Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Blur Angle\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== 4 \"linear_length\" 4 1 \"angle\" 4 1 \"samples\" 1 1 \"aspect\" 4 1 1 \"mapconstEdgeColor\" Float 4 1 AAAAAAAAAAAAAAAAAAAAAA=="
+  kernelSource "kernel LinearBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eRead, eAccessPoint, eEdgeConstant> map;\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 linear_length;\n    float4 angle;\n    int samples;\n    float4 aspect;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(linear_length, \"Linear Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(angle, \"Blur Angle\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n  \}\n\n  void process(int3 pos) \{\n    SampleType(map) blur_map = map();\n\n    float lin_x = pos.x;\n    float lin_y = pos.y;\n\n    float lin_x_add = linear_length\[pos.z] * cos(angle\[pos.z]) * blur_map\[pos.z] / samples;\n    float lin_y_add = linear_length\[pos.z] * sin(angle\[pos.z]) * blur_map\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    for (int sample=0; sample < samples; sample++) \{\n      sum += bilinear(src, lin_x, lin_y);\n\n      lin_x += lin_x_add;\n      lin_y += lin_y_add;\n    \}\n    dst() = sum / samples;\n  \}\n\};\n"
+  rebuild ""
+  "LinearBlur_Linear Length" {{parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur}}
+  "LinearBlur_Blur Angle" {{radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)}}
+  LinearBlur_Samples {{"rint(abs(max(max(parent.Linear_Blur.r,parent.Linear_Blur.g), max(parent.Linear_Blur.b,parent.Linear_Blur.a)))) +1"}}
+  LinearBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name LinearMap
+  xpos 607
+  ypos 13
+ }
+ Switch {
+  inputs 2
+  which {{"parent.Radial_Length.r || parent.Radial_Length.g || parent.Radial_Length.b || parent.Radial_Length.a"}}
+  name if_radial1
+  xpos 607
+  ypos 81
+ }
+ Switch {
+  inputs 2
+  which {{"parent.Zoom_Blur.r || parent.Zoom_Blur.g || parent.Zoom_Blur.b || parent.Zoom_Blur.a"}}
+  name if_zoom1
+  xpos 607
+  ypos 157
+ }
+ Switch {
+  inputs 2
+  which {{"(parent.Radial_Length.r || parent.Radial_Length.g || parent.Radial_Length.b || parent.Radial_Length.a) + (parent.Linear_Blur.r || parent.Linear_Blur.g || parent.Linear_Blur.b || parent.Linear_Blur.a) + (parent.Zoom_Blur.r || parent.Zoom_Blur.g || parent.Zoom_Blur.b || parent.Zoom_Blur.a) > 1"}}
+  name if_all1
+  xpos 607
+  ypos 226
+ }
+ Dot {
+  name Dot16
+  xpos 641
+  ypos 329
+ }
+push $N9f4b130
+ Dot {
+  name Dot2
+  xpos 365
+  ypos -92
+ }
+set Na004b40 [stack 0]
+ Dot {
+  name Dot4
+  xpos 228
+  ypos -92
+ }
+set Na0095a0 [stack 0]
+ Dot {
+  name Dot3
+  xpos 80
+  ypos -92
+ }
+ BlinkScript {
+  recompileCount 28
+  ProgramGroup 1
+  KernelDescription "2 \"FastDirBlur\" iterate componentWise ac010f6360c77de74c9cfe7f6b02cd84503831f9fe88c056e3fa989d0daa6b89 2 \"src\" Read Random \"dst\" Write Point 9 \"Radial Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Zoom Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Linear Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Blur Angle\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== \"Fade To Center\" Bool 1 AA== \"Max Distance To Center\" Float 1 AAAAAA== 9 \"radial_length\" 4 1 \"zoom_length\" 4 1 \"linear_length\" 4 1 \"angle\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 \"fade_to_center\" 1 1 \"max_dist_corner\" 1 1 0"
+  kernelSource "kernel FastDirBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 radial_length;  // This local variable is not exposed to the user.\n    float4 zoom_length;\n    float4 linear_length;\n    float4 angle;\n    float2 center;\n    int samples;\n    float4 aspect; \n    bool fade_to_center;\n    float max_dist_corner;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(radial_length, \"Radial Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n    defineParam(zoom_length, \"Zoom Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n    defineParam(linear_length, \"Linear Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(angle, \"Blur Angle\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n\n    defineParam(fade_to_center, \"Fade To Center\", false);\n    defineParam(max_dist_corner, \"Max Distance To Center\", 0.0f);\n  \}\n\n  void process(int3 pos) \{\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float theta_add = radial_length\[pos.z] / samples;\n\n    float lin_x = 0.0f;\n    float lin_y = 0.0f;\n\n    float fade_scale = fade_to_center ? radius / max_dist_corner : 1;\n\n    float radius_sub = zoom_length\[pos.z] * fade_scale / samples;\n    float lin_x_add = linear_length\[pos.z] * cos(angle\[pos.z]) * fade_scale / samples;\n    float lin_y_add = linear_length\[pos.z] * sin(angle\[pos.z]) * fade_scale / samples;\n\n    float sum = 0.0f;\n\n    int sample = 0;\n    while (sample < samples && radius >= 0) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x + lin_x, radius * sin(theta) + center.y + lin_y);\n\n      theta += theta_add;\n      radius -= radius_sub;\n      lin_x += lin_x_add;\n      lin_y += lin_y_add;\n      sample++;\n    \}\n    dst() = sum / sample;\n  \}\n\};\n"
+  rebuild ""
+  "FastDirBlur_Radial Length" {{radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)}}
+  "FastDirBlur_Zoom Length" {{parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur}}
+  "FastDirBlur_Linear Length" {{parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur}}
+  "FastDirBlur_Blur Angle" {{radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)}}
+  FastDirBlur_Center {{parent.Center.x} {parent.Center.y}}
+  FastDirBlur_Samples {{"max(abs(rint(max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y))) * radians(max(max(parent.Radial_Length.r,parent.Radial_Length.g), max(parent.Radial_Length.b,parent.Radial_Length.a)))/4)), max(rint(abs(max(max(parent.Zoom_Blur.r,parent.Zoom_Blur.g), max(parent.Zoom_Blur.b,parent.Zoom_Blur.a)))), rint(abs(max(max(parent.Linear_Blur.r,parent.Linear_Blur.g), max(parent.Linear_Blur.b,parent.Linear_Blur.a))))))  +1"}}
+  FastDirBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  "FastDirBlur_Fade To Center" {{parent.Fade_To_Center}}
+  "FastDirBlur_Max Distance To Center" {{"max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y)))"}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name RadialZoomLinear
+  xpos 46
+  ypos 16
+ }
+ Dot {
+  name Dot7
+  xpos 80
+  ypos 229
+ }
+push $Na0095a0
+ BlinkScript {
+  recompileCount 9
+  ProgramGroup 1
+  KernelDescription "2 \"ZoomBlur\" iterate componentWise 8ffbdbf95f64c12ff1e1ec3f6711c4c9616a36061d6699cc225399b6e80439ba 2 \"src\" Read Random \"dst\" Write Point 6 \"Zoom Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== \"Fade To Center\" Bool 1 AA== \"Max Distance To Center\" Float 1 AAAAAA== 6 \"zoom_length\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 \"fade_to_center\" 1 1 \"max_dist_corner\" 1 1 0"
+  kernelSource "kernel ZoomBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 zoom_length;\n    float2 center;\n    int samples;\n    float4 aspect; \n    bool fade_to_center;\n    float max_dist_corner;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(zoom_length, \"Zoom Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n\n    defineParam(fade_to_center, \"Fade To Center\", false);\n    defineParam(max_dist_corner, \"Max Distance To Center\", 0.0f);\n  \}\n\n  void process(int3 pos) \{\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float fade_scale = fade_to_center ? radius / max_dist_corner : 1;\n\n    float radius_sub = zoom_length\[pos.z] * fade_scale / samples;\n\n    float sum = 0.0f;\n\n    int sample = 0;\n    while (sample < samples && radius >= 0) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x, radius * sin(theta) + center.y);\n\n      radius -= radius_sub;\n      sample++;\n    \}\n    dst() = sum / sample;\n  \}\n\};\n"
+  rebuild ""
+  "ZoomBlur_Zoom Length" {{parent.Zoom_Blur} {parent.Zoom_Blur} {parent.Zoom_Blur} {curve}}
+  ZoomBlur_Center {{parent.Center.x} {parent.Center.y}}
+  ZoomBlur_Samples {{"rint(abs(max(max(parent.Zoom_Blur.r,parent.Zoom_Blur.g), max(parent.Zoom_Blur.b,parent.Zoom_Blur.a)))) +1"}}
+  ZoomBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  "ZoomBlur_Fade To Center" {{parent.Fade_To_Center}}
+  "ZoomBlur_Max Distance To Center" {{"max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y)))"}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name Zoom
+  xpos 194
+  ypos 16
+ }
+ Dot {
+  name Dot6
+  xpos 228
+  ypos 160
+ }
+push $Na004b40
+ BlinkScript {
+  recompileCount 30
+  ProgramGroup 1
+  KernelDescription "2 \"RadialBlur\" iterate componentWise e4ac50871c8b09f2fb744262bc5401227118993f0d935029be792145bbbe2e25 2 \"src\" Read Random \"dst\" Write Point 4 \"Radial Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== 4 \"radial_length\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 0"
+  kernelSource "kernel RadialBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 radial_length;  // This local variable is not exposed to the user.\n    float2 center;\n    int samples;\n    float4 aspect; \n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(radial_length, \"Radial Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n  \}\n\n  void process(int3 pos) \{\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float theta_add = radial_length\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    for (int sample=0; sample < samples; sample++) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x, radius * sin(theta) + center.y);\n\n      theta += theta_add;\n    \}\n    dst() = sum / samples;\n  \}\n\};\n"
+  rebuild ""
+  "RadialBlur_Radial Length" {{radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)} {radians(parent.Radial_Length)}}
+  RadialBlur_Center {{parent.Center.x} {parent.Center.y}}
+  RadialBlur_Samples {{"abs(rint(max(max(hypot(parent.Center.x, parent.Center.y), hypot(parent.Center.x, height - parent.Center.y)), max(hypot(width - parent.Center.x, parent.Center.y), hypot(width - parent.Center.x, height - parent.Center.y))) * radians(max(max(parent.Radial_Length.r,parent.Radial_Length.g), max(parent.Radial_Length.b,parent.Radial_Length.a)))/4)) +1"}}
+  RadialBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name Radial
+  xpos 331
+  ypos 15
+ }
+ Dot {
+  name Dot5
+  xpos 365
+  ypos 84
+ }
+push $N9f4b130
+ BlinkScript {
+  recompileCount 29
+  ProgramGroup 1
+  KernelDescription "2 \"LinearBlur\" iterate componentWise d7452772e3f201bfa803a7b5c52c8022610849c29905ce9b5e141ae1d5ada433 2 \"src\" Read Random \"dst\" Write Point 4 \"Linear Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Blur Angle\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== 4 \"linear_length\" 4 1 \"angle\" 4 1 \"samples\" 1 1 \"aspect\" 4 1 0"
+  kernelSource "kernel LinearBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 linear_length;\n    float4 angle;\n    int samples;\n    float4 aspect;\n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(linear_length, \"Linear Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(angle, \"Blur Angle\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n  \}\n\n  void process(int3 pos) \{\n    float lin_x = pos.x;\n    float lin_y = pos.y;\n\n    float lin_x_add = linear_length\[pos.z] * cos(angle\[pos.z]) / samples;\n    float lin_y_add = linear_length\[pos.z] * sin(angle\[pos.z]) / samples;\n\n    float sum = 0.0f;\n\n    for (int sample=0; sample < samples; sample++) \{\n      sum += bilinear(src, lin_x, lin_y);\n\n      lin_x += lin_x_add;\n      lin_y += lin_y_add;\n    \}\n    dst() = sum / samples;\n  \}\n\};\n"
+  rebuild ""
+  "LinearBlur_Linear Length" {{parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur} {parent.Linear_Blur}}
+  "LinearBlur_Blur Angle" {{radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)} {radians(parent.Blur_Angle)}}
+  LinearBlur_Samples {{"rint(abs(max(max(parent.Linear_Blur.r,parent.Linear_Blur.g), max(parent.Linear_Blur.b,parent.Linear_Blur.a)))) +1"}}
+  LinearBlur_Aspect {{parent.Aspect} {parent.Aspect} {parent.Aspect} {parent.Aspect}}
+  rebuild_finalise ""
+  maxTileLines 40
+  name Linear
+  xpos 465
+  ypos 13
+ }
+ Switch {
+  inputs 2
+  which {{"parent.Radial_Length.r || parent.Radial_Length.g || parent.Radial_Length.b || parent.Radial_Length.a"}}
+  name if_radial
+  xpos 465
+  ypos 81
+ }
+ Switch {
+  inputs 2
+  which {{"parent.Zoom_Blur.r || parent.Zoom_Blur.g || parent.Zoom_Blur.b || parent.Zoom_Blur.a"}}
+  name if_zoom
+  xpos 465
+  ypos 157
+ }
+ Switch {
+  inputs 2
+  which {{"(parent.Radial_Length.r || parent.Radial_Length.g || parent.Radial_Length.b || parent.Radial_Length.a) + (parent.Linear_Blur.r || parent.Linear_Blur.g || parent.Linear_Blur.b || parent.Linear_Blur.a) + (parent.Zoom_Blur.r || parent.Zoom_Blur.g || parent.Zoom_Blur.b || parent.Zoom_Blur.a) > 1"}}
+  name if_all
+  xpos 465
+  ypos 226
+ }
+ Switch {
+  inputs 2
+  which {{"\[exists parent.input1] "}}
+  name Mode
+  xpos 465
+  ypos 326
+ }
+ Switch {
+  which {{"\[exists parent.input0] ? 0 : 1"}}
+  name notError
+  xpos 465
+  ypos 422
+ }
+ Output {
+  name Output1
+  xpos 465
+  ypos 520
+ }
+ BlinkScript {
+  inputs 0
+  recompileCount 31
+  ProgramGroup 1
+  KernelDescription "2 \"RadialBlur\" iterate componentWise 2f87013377d6ab9234e333a0b33ab31a1ca00ccde98e8262c6a6439e1a8f31aa 3 \"src\" Read Random \"map\" Read Point \"dst\" Write Point 4 \"Radial Length\" Float 4 AAAAAAAAAAAAAAAAAAAAAA== \"Center\" Float 2 AAAAAAAAAAA= \"Samples\" Int 1 yAAAAA== \"Aspect\" Float 4 AACAPwAAgD8AAIA/AACAPw== 4 \"radial_length\" 4 1 \"center\" 2 1 \"samples\" 1 1 \"aspect\" 4 1 0"
+  kernelSource "kernel RadialBlur : ImageComputationKernel<eComponentWise>\n\{\n  Image<eRead, eAccessRandom, eEdgeClamped> src; // the input image\n  Image<eRead, eAccessPoint, eEdgeClamped> map;\n  Image<eWrite> dst; // the output image\n\n  param:\n    float4 radial_length;  // This local variable is not exposed to the user.\n    float2 center;\n    int samples;\n    float4 aspect; \n\n  // In define(), parameters can be given labels and default values.\n  void define() \{\n    defineParam(radial_length, \"Radial Length\", float4(0.0f, 0.0f, 0.0f, 0.0f));\n\n    defineParam(center, \"Center\", float2(0.0f, 0.0f));\n    defineParam(samples, \"Samples\", 200);\n\n    defineParam(aspect, \"Aspect\", float4(1.0f, 1.0f, 1.0f, 1.0f));\n  \}\n\n  void process(int3 pos) \{\n    SampleType(map) blur_map = map();\n\n    float2 offset_pos((pos.x - center.x) * aspect\[pos.z], pos.y - center.y);\n\n    float radius = sqrt(offset_pos.x * offset_pos.x + offset_pos.y * offset_pos.y);\n    float theta = atan2(offset_pos.y, offset_pos.x);\n\n    float theta_add = radial_length\[pos.z] * blur_map\[pos.z] / samples;\n\n    float sum = 0.0f;\n\n    for (int sample=0; sample < samples; sample++) \{\n      sum += bilinear(src, radius * cos(theta)/aspect\[pos.z] + center.x, radius * sin(theta) + center.y);\n\n      theta += theta_add;\n    \}\n    dst() = sum / samples;\n  \}\n\};\n"
+  rebuild ""
+  "RadialBlur_Radial Length" {1.745329252 1.745329252 1.745329252 1.745329252}
+  RadialBlur_Center {1024 778}
+  RadialBlur_Samples 562
+  RadialBlur_Aspect {1 1 1 1}
+  rebuild_finalise ""
+  maxTileLines 40
+  name RadialMap1
+  selected true
+  xpos 748
+  ypos -154
+ }
+end_group
